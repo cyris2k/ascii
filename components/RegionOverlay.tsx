@@ -133,38 +133,8 @@ export default function RegionOverlay({
   const cx = (col: number) => col * charW + PAD + charW / 2;
   const cy = (row: number) => row * charH + PAD + charH / 2;
 
-  const renderRegion = (region: Region) => {
-    const fill = region.color;
-    const shared = { fill, fillOpacity: 0.18, stroke: fill, strokeOpacity: 0.7, strokeWidth: 1, strokeDasharray: '4 2' };
-
-    if (region.type === 'rect') {
-      const c0 = Math.min(region.colStart, region.colEnd);
-      const r0 = Math.min(region.rowStart, region.rowEnd);
-      const c1 = Math.max(region.colStart, region.colEnd);
-      const r1 = Math.max(region.rowStart, region.rowEnd);
-      return (
-        <rect key={region.id}
-          x={c0 * charW + PAD} y={r0 * charH + PAD}
-          width={(c1 - c0 + 1) * charW} height={(r1 - r0 + 1) * charH}
-          {...shared}
-        />
-      );
-    }
-    if (region.type === 'circle') {
-      return (
-        <ellipse key={region.id}
-          cx={cx(region.centerCol)} cy={cy(region.centerRow)}
-          rx={region.radiusCols * charW} ry={region.radiusRows * charH}
-          {...shared}
-        />
-      );
-    }
-    if (region.type === 'polygon' && region.points.length >= 3) {
-      const pts = region.points.map(p => `${cx(p.col)},${cy(p.row)}`).join(' ');
-      return <polygon key={region.id} points={pts} {...shared} />;
-    }
-    return null;
-  };
+  // Placed regions have no visual — only the colored text in the ASCII output shows them
+  const renderRegion = (_region: Region) => null;
 
   const renderPreview = () => {
     if (draw.phase === 'idle') return null;
