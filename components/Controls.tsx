@@ -1,7 +1,7 @@
 'use client';
 
-import type { CharsetMode, AsciiResult } from '@/lib/converter';
-import { DEFAULT_TEXT } from '@/lib/converter';
+import type { CharsetMode, AsciiResult, ImageAdjustments } from '@/lib/converter';
+import { DEFAULT_TEXT, DEFAULT_ADJUSTMENTS } from '@/lib/converter';
 import type { Region, ShapeType } from '@/lib/regions';
 import { exportSVG, exportPNG } from '@/lib/exporter';
 
@@ -47,6 +47,8 @@ interface Props {
   setActiveShapeType: (s: ShapeType) => void;
   activeRegionColor: string;
   setActiveRegionColor: (c: string) => void;
+  adjustments: ImageAdjustments;
+  setAdjustments: (a: ImageAdjustments) => void;
 }
 
 export default function Controls({
@@ -57,7 +59,11 @@ export default function Controls({
   regions, onDeleteRegion,
   drawingMode, setDrawingMode, activeShapeType, setActiveShapeType,
   activeRegionColor, setActiveRegionColor,
+  adjustments, setAdjustments,
 }: Props) {
+  const adj = (key: keyof ImageAdjustments) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setAdjustments({ ...adjustments, [key]: Number(e.target.value) });
+
   return (
     <aside className="w-72 shrink-0 bg-[#F8FFFA] border-r border-[#d1e8d8] flex flex-col overflow-y-auto">
       {/* Logo */}
@@ -304,6 +310,44 @@ export default function Controls({
               Invert colors
             </span>
           </label>
+        </section>
+
+        {/* Image Adjustments */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-[#6b7280] font-mono text-xs tracking-widest uppercase">
+              Image
+            </label>
+            <button
+              onClick={() => setAdjustments(DEFAULT_ADJUSTMENTS)}
+              className="text-[#9ca3af] hover:text-[#166534] font-mono text-[10px] transition-colors"
+            >
+              reset
+            </button>
+          </div>
+
+          {(
+            [
+              { key: 'threshold',  label: 'Threshold',    min: 0.05, max: 0.95, step: 0.01 },
+              { key: 'gamma',      label: 'Gamma',         min: 0.1,  max: 3.0,  step: 0.05 },
+              { key: 'blackPoint', label: 'Black Point',   min: 0,    max: 0.9,  step: 0.01 },
+              { key: 'whitePoint', label: 'White Point',   min: 0.1,  max: 1.0,  step: 0.01 },
+              { key: 'contrast',   label: 'Contrast',      min: 0.5,  max: 3.0,  step: 0.05 },
+            ] as const
+          ).map(({ key, label, min, max, step }) => (
+            <div key={key} className="mb-3">
+              <div className="flex justify-between mb-1">
+                <span className="text-[#6b7280] font-mono text-xs">{label}</span>
+                <span className="text-[#1a1a1a] font-mono text-xs">{adjustments[key].toFixed(2)}</span>
+              </div>
+              <input
+                type="range" min={min} max={max} step={step}
+                value={adjustments[key]}
+                onChange={adj(key)}
+                className="w-full accent-[#166534]"
+              />
+            </div>
+          ))}
         </section>
 
       </div>

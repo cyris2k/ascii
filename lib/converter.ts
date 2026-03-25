@@ -29,6 +29,22 @@ export interface AsciiResult {
   numRows: number;
 }
 
+export interface ImageAdjustments {
+  threshold: number;   // 0–1, cutoff for text/region dark pixels (default 0.55)
+  gamma: number;       // 0.1–3.0 (default 1.0)
+  blackPoint: number;  // 0–0.9 (default 0.0)
+  whitePoint: number;  // 0.1–1.0 (default 1.0)
+  contrast: number;    // 0.5–3.0 (default 1.0)
+}
+
+export const DEFAULT_ADJUSTMENTS: ImageAdjustments = {
+  threshold: 0.55,
+  gamma: 1.0,
+  blackPoint: 0.0,
+  whitePoint: 1.0,
+  contrast: 1.0,
+};
+
 export interface ConvertOptions {
   mode: CharsetMode;
   cols: number;
@@ -36,6 +52,18 @@ export interface ConvertOptions {
   customText: string;
   regions: Region[];
   baseFgColor: string;
+  adjustments: ImageAdjustments;
+}
+
+function applyAdjustments(b: number, adj: ImageAdjustments): number {
+  // Levels: remap [blackPoint, whitePoint] → [0, 1]
+  b = (b - adj.blackPoint) / Math.max(adj.whitePoint - adj.blackPoint, 0.001);
+  b = Math.max(0, Math.min(1, b));
+  // Gamma
+  b = Math.pow(b, adj.gamma);
+  // Contrast: pivot around 0.5
+  b = (b - 0.5) * adj.contrast + 0.5;
+  return Math.max(0, Math.min(1, b));
 }
 
 function getAvgBrightness(
@@ -56,7 +84,7 @@ function getAvgBrightness(
 
 export function convertToAscii(imageData: ImageData, opts: ConvertOptions): AsciiResult {
   const { data, width, height } = imageData;
-  const { mode, cols, invert, customText, regions, baseFgColor } = opts;
+  const { mode, cols, invert, customText, regions, baseFgColor, adjustments: adj } = opts;
 
   const cellW = width / cols;
   const cellH = cellW * 2.0;
@@ -81,6 +109,7 @@ export function convertToAscii(imageData: ImageData, opts: ConvertOptions): Asci
       const x1 = Math.min(Math.floor(((col + 1) / cols) * width), width);
 
       let b = getAvgBrightness(data, x0, y0, x1, y1, width);
+      b = applyAdjustments(b, adj);
       if (invert) b = 1 - b;
 
       // Last region that contains this cell wins (top = last drawn)
@@ -97,10 +126,10 @@ export function convertToAscii(imageData: ImageData, opts: ConvertOptions): Asci
 
       if (regionColor !== null) {
         // Paragraph text in region color
-        char = b < 0.55 ? textSrc[regionTextIdx++ % textSrc.length] : ' ';
+        char = b < adj.threshold ? textSrc[regionTextIdx++ % textSrc.length] : ' ';
         color = regionColor;
       } else if (mode === 'text') {
-        char = b < 0.55 ? textSrc[baseTextIdx++ % textSrc.length] : ' ';
+        char = b < adj.threshold ? textSrc[baseTextIdx++ % textSrc.length] : ' ';
         color = baseFgColor;
       } else {
         char = chars![Math.floor(b * (chars!.length - 1))];

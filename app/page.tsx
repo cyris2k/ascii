@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import Uploader from '@/components/Uploader';
 import Preview from '@/components/Preview';
 import Controls from '@/components/Controls';
-import { convertToAscii, CharsetMode, AsciiResult, DEFAULT_TEXT } from '@/lib/converter';
+import { convertToAscii, CharsetMode, AsciiResult, DEFAULT_TEXT, ImageAdjustments, DEFAULT_ADJUSTMENTS } from '@/lib/converter';
 import type { Region, ShapeType } from '@/lib/regions';
 
 export default function Home() {
@@ -19,6 +19,9 @@ export default function Home() {
   const [fontSize, setFontSize] = useState(10);
   const [baseFgColor, setBaseFgColor] = useState('#1a1a1a');
   const [bgColor, setBgColor] = useState('#F8FFFA');
+
+  // Image adjustments
+  const [adjustments, setAdjustments] = useState<ImageAdjustments>(DEFAULT_ADJUSTMENTS);
 
   // Regions
   const [regions, setRegions] = useState<Region[]>([]);
@@ -37,7 +40,7 @@ export default function Home() {
     canvas.height = image.naturalHeight;
     ctx.drawImage(image, 0, 0);
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const ascii = convertToAscii(imageData, { mode, cols, invert, customText, regions, baseFgColor });
+    const ascii = convertToAscii(imageData, { mode, cols, invert, customText, regions, baseFgColor, adjustments });
     setResult(ascii);
   }, [image, mode, cols, invert, customText, regions, baseFgColor]);
 
@@ -55,6 +58,7 @@ export default function Home() {
     setResult(null);
     setRegions([]);
     setDrawingMode(false);
+    setAdjustments(DEFAULT_ADJUSTMENTS);
   }, []);
 
   const addRegion = useCallback((r: Region) => setRegions(prev => [...prev, r]), []);
@@ -82,6 +86,7 @@ export default function Home() {
             drawingMode={drawingMode} setDrawingMode={setDrawingMode}
             activeShapeType={activeShapeType} setActiveShapeType={setActiveShapeType}
             activeRegionColor={activeRegionColor} setActiveRegionColor={setActiveRegionColor}
+            adjustments={adjustments} setAdjustments={setAdjustments}
           />
           <Preview
             result={result}
