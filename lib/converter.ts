@@ -1,6 +1,8 @@
+import { hitTest, Region } from './regions';
+
 export type CharsetMode = 'ascii' | 'binary' | 'numbers' | 'code' | 'text';
 
-// Ordered dense → light (brightness 0 = black → index 0, brightness 1 = white → last index)
+// Ordered dense → light
 const CHARSETS: Record<Exclude<CharsetMode, 'text'>, string> = {
   ascii:   '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,"^`. ',
   binary:  '10 ',
@@ -16,23 +18,29 @@ export const DEFAULT_TEXT =
   'Every pixel tells a story every character carries weight every line holds meaning. ' +
   'We are the architects of vision building cathedrals from simple marks on a screen. ';
 
+export interface ColorRun {
+  text: string;
+  color: string;
+}
+
+export interface AsciiResult {
+  rows: ColorRun[][];
+  cols: number;
+  numRows: number;
+}
+
 export interface ConvertOptions {
   mode: CharsetMode;
   cols: number;
   invert: boolean;
   customText: string;
-}
-
-export interface AsciiResult {
-  rows: string[];
-  cols: number;
-  numRows: number;
+  regions: Region[];
+  baseFgColor: string;
 }
 
 function getAvgBrightness(
   data: Uint8ClampedArray,
-  x0: number, y0: number,
-  x1: number, y1: number,
+  x0: number, y0: number, x1: number, y1: number,
   width: number
 ): number {
   let sum = 0, count = 0;
@@ -48,21 +56,23 @@ function getAvgBrightness(
 
 export function convertToAscii(imageData: ImageData, opts: ConvertOptions): AsciiResult {
   const { data, width, height } = imageData;
-  const { mode, cols, invert, customText } = opts;
+  const { mode, cols, invert, customText, regions, baseFgColor } = opts;
 
-  // Monospace chars are ~0.5x as wide as tall — compensate so output matches image aspect
   const cellW = width / cols;
   const cellH = cellW * 2.0;
   const numRows = Math.floor(height / cellH);
 
   const chars = mode !== 'text' ? CHARSETS[mode] : null;
   const textSrc = (customText || DEFAULT_TEXT).replace(/\s+/g, ' ').trim();
-  let textIdx = 0;
+  let baseTextIdx = 0;
+  let regionTextIdx = 0;
 
-  const rows: string[] = [];
+  const rows: ColorRun[][] = [];
 
   for (let row = 0; row < numRows; row++) {
-    let line = '';
+    const coloredRow: ColorRun[] = [];
+    let currentRun: ColorRun | null = null;
+
     const y0 = Math.floor(row * cellH);
     const y1 = Math.min(Math.floor((row + 1) * cellH), height);
 
@@ -73,19 +83,40 @@ export function convertToAscii(imageData: ImageData, opts: ConvertOptions): Asci
       let b = getAvgBrightness(data, x0, y0, x1, y1, width);
       if (invert) b = 1 - b;
 
-      if (mode === 'text') {
-        if (b < 0.55) {
-          line += textSrc[textIdx % textSrc.length];
-          textIdx++;
-        } else {
-          line += ' ';
+      // Last region that contains this cell wins (top = last drawn)
+      let regionColor: string | null = null;
+      for (let ri = regions.length - 1; ri >= 0; ri--) {
+        if (hitTest(col, row, regions[ri])) {
+          regionColor = regions[ri].color;
+          break;
         }
+      }
+
+      let char: string;
+      let color: string;
+
+      if (regionColor !== null) {
+        // Paragraph text in region color
+        char = b < 0.55 ? textSrc[regionTextIdx++ % textSrc.length] : ' ';
+        color = regionColor;
+      } else if (mode === 'text') {
+        char = b < 0.55 ? textSrc[baseTextIdx++ % textSrc.length] : ' ';
+        color = baseFgColor;
       } else {
-        const idx = Math.floor(b * (chars!.length - 1));
-        line += chars![idx];
+        char = chars![Math.floor(b * (chars!.length - 1))];
+        color = baseFgColor;
+      }
+
+      // Group consecutive same-color chars into runs
+      if (currentRun && currentRun.color === color) {
+        currentRun.text += char;
+      } else {
+        if (currentRun) coloredRow.push(currentRun);
+        currentRun = { text: char, color };
       }
     }
-    rows.push(line);
+    if (currentRun) coloredRow.push(currentRun);
+    rows.push(coloredRow);
   }
 
   return { rows, cols, numRows };

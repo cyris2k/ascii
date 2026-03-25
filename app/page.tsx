@@ -5,35 +5,41 @@ import Uploader from '@/components/Uploader';
 import Preview from '@/components/Preview';
 import Controls from '@/components/Controls';
 import { convertToAscii, CharsetMode, AsciiResult, DEFAULT_TEXT } from '@/lib/converter';
+import type { Region, ShapeType } from '@/lib/regions';
 
 export default function Home() {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [result, setResult] = useState<AsciiResult | null>(null);
-  const [mode, setMode] = useState<CharsetMode>('ascii');
+
+  // Base layer
+  const [mode, setMode] = useState<CharsetMode>('code');
   const [cols, setCols] = useState(100);
   const [invert, setInvert] = useState(false);
   const [customText, setCustomText] = useState(DEFAULT_TEXT);
   const [fontSize, setFontSize] = useState(10);
-  const [fgColor, setFgColor] = useState('#e5e5e5');
-  const [bgColor, setBgColor] = useState('#0a0a0a');
+  const [baseFgColor, setBaseFgColor] = useState('#1a1a1a');
+  const [bgColor, setBgColor] = useState('#F8FFFA');
+
+  // Regions
+  const [regions, setRegions] = useState<Region[]>([]);
+  const [drawingMode, setDrawingMode] = useState(false);
+  const [activeShapeType, setActiveShapeType] = useState<ShapeType>('rect');
+  const [activeRegionColor, setActiveRegionColor] = useState('#3b82f6');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const process = useCallback(() => {
     if (!image || !canvasRef.current) return;
-
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
     canvas.width = image.naturalWidth;
     canvas.height = image.naturalHeight;
     ctx.drawImage(image, 0, 0);
-
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const ascii = convertToAscii(imageData, { mode, cols, invert, customText });
+    const ascii = convertToAscii(imageData, { mode, cols, invert, customText, regions, baseFgColor });
     setResult(ascii);
-  }, [image, mode, cols, invert, customText]);
+  }, [image, mode, cols, invert, customText, regions, baseFgColor]);
 
   useEffect(() => {
     if (image) process();
@@ -47,11 +53,15 @@ export default function Home() {
   const handleReset = useCallback(() => {
     setImage(null);
     setResult(null);
+    setRegions([]);
+    setDrawingMode(false);
   }, []);
+
+  const addRegion = useCallback((r: Region) => setRegions(prev => [...prev, r]), []);
+  const deleteRegion = useCallback((id: string) => setRegions(prev => prev.filter(r => r.id !== id)), []);
 
   return (
     <main className="h-screen flex overflow-hidden bg-[#F8FFFA]">
-      {/* Hidden canvas for pixel extraction */}
       <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
 
       {!image ? (
@@ -66,14 +76,23 @@ export default function Home() {
             onReset={handleReset}
             result={result}
             fontSize={fontSize} setFontSize={setFontSize}
-            fgColor={fgColor} setFgColor={setFgColor}
             bgColor={bgColor} setBgColor={setBgColor}
+            baseFgColor={baseFgColor} setBaseFgColor={setBaseFgColor}
+            regions={regions} onDeleteRegion={deleteRegion}
+            drawingMode={drawingMode} setDrawingMode={setDrawingMode}
+            activeShapeType={activeShapeType} setActiveShapeType={setActiveShapeType}
+            activeRegionColor={activeRegionColor} setActiveRegionColor={setActiveRegionColor}
           />
           <Preview
             result={result}
             fontSize={fontSize}
-            fgColor={fgColor}
             bgColor={bgColor}
+            regions={regions}
+            activeShapeType={activeShapeType}
+            activeRegionColor={activeRegionColor}
+            drawingMode={drawingMode}
+            onAddRegion={addRegion}
+            onDeleteRegion={deleteRegion}
           />
         </>
       )}
