@@ -50,7 +50,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="h-screen flex overflow-hidden bg-[#0a0a0a]">
+    <main className="h-screen flex overflow-hidden bg-[#F8FFFA]">
       {/* Hidden canvas for pixel extraction */}
       <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
 

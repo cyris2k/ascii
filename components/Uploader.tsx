@@ -25,7 +25,6 @@ export default function Uploader({ onImage }: Props) {
     img.src = src;
   }, [onImage]);
 
-  // Global paste handler
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
       const items = Array.from(e.clipboardData?.items ?? []);
@@ -44,19 +43,18 @@ export default function Uploader({ onImage }: Props) {
     setDragging(false);
     const file = e.dataTransfer.files[0];
     if (file) { load(file); return; }
-    // URL drop
     const url = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
     if (url) loadUrl(url);
   }, [load, loadUrl]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-8">
+    <div className="min-h-screen bg-[#F8FFFA] flex flex-col items-center justify-center p-8">
       {/* Header */}
       <div className="mb-12 text-center">
-        <h1 className="text-5xl font-mono font-bold text-white tracking-tight mb-2">
-          <span className="text-[#39ff14]">ASCII</span> TOOL
+        <h1 className="text-5xl font-mono font-bold text-[#1a1a1a] tracking-tight mb-2">
+          <span className="text-[#166534]">ASCII</span> TOOL
         </h1>
-        <p className="text-zinc-500 font-mono text-sm tracking-widest">
+        <p className="text-[#6b7280] font-mono text-sm tracking-widest">
           IMAGE → CHARACTER ART
         </p>
       </div>
@@ -72,18 +70,18 @@ export default function Uploader({ onImage }: Props) {
           flex flex-col items-center justify-center cursor-pointer select-none
           transition-all duration-200
           ${dragging
-            ? 'border-[#39ff14] bg-[#39ff14]/5 scale-[1.02]'
-            : 'border-zinc-700 hover:border-zinc-500 bg-zinc-900/40'
+            ? 'border-[#166534] bg-[#166534]/5 scale-[1.02]'
+            : 'border-[#c8d9cc] hover:border-[#166534]/50 bg-white/60'
           }
         `}
       >
-        <div className="text-6xl mb-4 font-mono text-zinc-600">
+        <div className="text-6xl mb-4 font-mono text-[#9ca3af]">
           {dragging ? '⬇' : '⬆'}
         </div>
-        <p className="text-white font-mono text-lg font-semibold mb-1">
+        <p className="text-[#1a1a1a] font-mono text-lg font-semibold mb-1">
           Drop image here
         </p>
-        <p className="text-zinc-500 font-mono text-sm">
+        <p className="text-[#6b7280] font-mono text-sm">
           or click to browse · paste with ⌘V
         </p>
         <input
@@ -96,14 +94,14 @@ export default function Uploader({ onImage }: Props) {
       </div>
 
       {/* Supported formats */}
-      <p className="mt-6 text-zinc-600 font-mono text-xs tracking-wider">
+      <p className="mt-6 text-[#9ca3af] font-mono text-xs tracking-wider">
         PNG · JPG · WEBP · GIF · SVG · BMP
       </p>
 
       {/* Preview char modes */}
-      <div className="mt-12 flex gap-6 text-zinc-700 font-mono text-xs">
+      <div className="mt-12 flex gap-6 text-[#9ca3af] font-mono text-xs">
         {['@#$%&', '101010', '987654', '{}[]<>', 'Lorem ipsum'].map((s, i) => (
-          <span key={i} className="opacity-50 hover:opacity-100 transition-opacity">{s}</span>
+          <span key={i} className="opacity-60 hover:opacity-100 transition-opacity">{s}</span>
         ))}
       </div>
     </div>

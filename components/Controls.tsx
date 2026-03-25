@@ -37,15 +37,15 @@ export default function Controls({
   fontSize, setFontSize, fgColor, setFgColor, bgColor, setBgColor,
 }: Props) {
   return (
-    <aside className="w-72 shrink-0 bg-[#0f0f0f] border-r border-zinc-800 flex flex-col overflow-y-auto">
+    <aside className="w-72 shrink-0 bg-[#F8FFFA] border-r border-[#d1e8d8] flex flex-col overflow-y-auto">
       {/* Logo */}
-      <div className="p-5 border-b border-zinc-800 flex items-center justify-between">
-        <span className="font-mono font-bold text-lg text-white">
-          <span className="text-[#39ff14]">ASCII</span> TOOL
+      <div className="p-5 border-b border-[#d1e8d8] flex items-center justify-between">
+        <span className="font-mono font-bold text-lg text-[#1a1a1a]">
+          <span className="text-[#166534]">ASCII</span> TOOL
         </span>
         <button
           onClick={onReset}
-          className="text-zinc-500 hover:text-white font-mono text-xs transition-colors px-2 py-1 rounded hover:bg-zinc-800"
+          className="text-[#6b7280] hover:text-[#1a1a1a] font-mono text-xs transition-colors px-2 py-1 rounded hover:bg-[#e6f2ea]"
         >
           ← new
         </button>
@@ -54,7 +54,7 @@ export default function Controls({
       <div className="flex-1 p-5 space-y-6">
         {/* Character Set */}
         <section>
-          <label className="block text-zinc-400 font-mono text-xs tracking-widest uppercase mb-3">
+          <label className="block text-[#6b7280] font-mono text-xs tracking-widest uppercase mb-3">
             Character Set
           </label>
           <div className="space-y-1.5">
@@ -66,8 +66,8 @@ export default function Controls({
                   w-full flex items-center justify-between px-3 py-2.5 rounded-lg font-mono text-sm
                   transition-all duration-150
                   ${mode === m.id
-                    ? 'bg-[#39ff14]/10 border border-[#39ff14]/30 text-[#39ff14]'
-                    : 'border border-transparent text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+                    ? 'bg-[#166534]/10 border border-[#166534]/30 text-[#166534]'
+                    : 'border border-transparent text-[#374151] hover:text-[#1a1a1a] hover:bg-[#e6f2ea]'
                   }
                 `}
               >
@@ -81,7 +81,7 @@ export default function Controls({
         {/* Custom text (only for text mode) */}
         {mode === 'text' && (
           <section>
-            <label className="block text-zinc-400 font-mono text-xs tracking-widest uppercase mb-3">
+            <label className="block text-[#6b7280] font-mono text-xs tracking-widest uppercase mb-3">
               Paragraph Text
             </label>
             <textarea
@@ -89,11 +89,11 @@ export default function Controls({
               onChange={(e) => setCustomText(e.target.value)}
               placeholder={DEFAULT_TEXT}
               rows={5}
-              className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-3 font-mono text-xs text-white resize-none focus:outline-none focus:border-[#39ff14]/50 placeholder:text-zinc-600"
+              className="w-full bg-white border border-[#c8d9cc] rounded-lg p-3 font-mono text-xs text-[#1a1a1a] resize-none focus:outline-none focus:border-[#166534]/50 placeholder:text-[#9ca3af]"
             />
             <button
               onClick={() => setCustomText(DEFAULT_TEXT)}
-              className="mt-1.5 text-zinc-500 hover:text-zinc-300 font-mono text-xs transition-colors"
+              className="mt-1.5 text-[#6b7280] hover:text-[#166534] font-mono text-xs transition-colors"
             >
               reset to default
             </button>
@@ -103,18 +103,18 @@ export default function Controls({
         {/* Resolution */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <label className="text-zinc-400 font-mono text-xs tracking-widest uppercase">
+            <label className="text-[#6b7280] font-mono text-xs tracking-widest uppercase">
               Resolution
             </label>
-            <span className="text-white font-mono text-xs">{cols} cols</span>
+            <span className="text-[#1a1a1a] font-mono text-xs">{cols} cols</span>
           </div>
           <input
             type="range" min={30} max={220} step={5}
             value={cols}
             onChange={(e) => setCols(Number(e.target.value))}
-            className="w-full accent-[#39ff14]"
+            className="w-full accent-[#166534]"
           />
-          <div className="flex justify-between text-zinc-600 font-mono text-[10px] mt-1">
+          <div className="flex justify-between text-[#9ca3af] font-mono text-[10px] mt-1">
             <span>low</span><span>high</span>
           </div>
         </section>
@@ -122,22 +122,22 @@ export default function Controls({
         {/* Font size */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <label className="text-zinc-400 font-mono text-xs tracking-widest uppercase">
+            <label className="text-[#6b7280] font-mono text-xs tracking-widest uppercase">
               Font Size
             </label>
-            <span className="text-white font-mono text-xs">{fontSize}px</span>
+            <span className="text-[#1a1a1a] font-mono text-xs">{fontSize}px</span>
           </div>
           <input
             type="range" min={4} max={20} step={1}
             value={fontSize}
             onChange={(e) => setFontSize(Number(e.target.value))}
-            className="w-full accent-[#39ff14]"
+            className="w-full accent-[#166534]"
           />
         </section>
 
         {/* Colors */}
         <section>
-          <label className="block text-zinc-400 font-mono text-xs tracking-widest uppercase mb-3">
+          <label className="block text-[#6b7280] font-mono text-xs tracking-widest uppercase mb-3">
             Colors
           </label>
           <div className="space-y-2">
@@ -147,7 +147,7 @@ export default function Controls({
                 onChange={(e) => setFgColor(e.target.value)}
                 className="h-8 w-12 rounded cursor-pointer bg-transparent border-0"
               />
-              <span className="text-zinc-400 font-mono text-xs">Foreground</span>
+              <span className="text-[#6b7280] font-mono text-xs">Foreground</span>
             </div>
             <div className="flex items-center gap-3">
               <input
@@ -155,7 +155,7 @@ export default function Controls({
                 onChange={(e) => setBgColor(e.target.value)}
                 className="h-8 w-12 rounded cursor-pointer bg-transparent border-0"
               />
-              <span className="text-zinc-400 font-mono text-xs">Background</span>
+              <span className="text-[#6b7280] font-mono text-xs">Background</span>
             </div>
           </div>
 
@@ -163,15 +163,15 @@ export default function Controls({
           <div className="mt-3 flex flex-wrap gap-2">
             {[
               { fg: '#e5e5e5', bg: '#0a0a0a', label: 'Dark' },
-              { fg: '#0a0a0a', bg: '#f5f5f5', label: 'Light' },
-              { fg: '#39ff14', bg: '#0a0a0a', label: 'Matrix' },
+              { fg: '#1a1a1a', bg: '#f5f5f5', label: 'Light' },
+              { fg: '#166534', bg: '#F8FFFA', label: 'Green' },
               { fg: '#00bfff', bg: '#0a0a0a', label: 'Cyan' },
               { fg: '#ff6b35', bg: '#0a0a0a', label: 'Amber' },
             ].map((preset) => (
               <button
                 key={preset.label}
                 onClick={() => { setFgColor(preset.fg); setBgColor(preset.bg); }}
-                className="px-2 py-1 rounded font-mono text-[10px] border border-zinc-700 hover:border-zinc-500 transition-colors"
+                className="px-2 py-1 rounded font-mono text-[10px] border border-[#c8d9cc] hover:border-[#166534]/50 transition-colors"
                 style={{ color: preset.fg, backgroundColor: preset.bg }}
               >
                 {preset.label}
@@ -187,7 +187,7 @@ export default function Controls({
               onClick={() => setInvert(!invert)}
               className={`
                 relative w-10 h-5 rounded-full transition-colors duration-200
-                ${invert ? 'bg-[#39ff14]/80' : 'bg-zinc-700'}
+                ${invert ? 'bg-[#166534]/80' : 'bg-[#c8d9cc]'}
               `}
             >
               <div className={`
@@ -195,7 +195,7 @@ export default function Controls({
                 ${invert ? 'translate-x-5' : 'translate-x-0.5'}
               `} />
             </div>
-            <span className="text-zinc-400 group-hover:text-white font-mono text-sm transition-colors">
+            <span className="text-[#6b7280] group-hover:text-[#1a1a1a] font-mono text-sm transition-colors">
               Invert colors
             </span>
           </label>
@@ -204,19 +204,19 @@ export default function Controls({
 
       {/* Export buttons */}
       {result && (
-        <div className="p-5 border-t border-zinc-800 space-y-2">
-          <label className="block text-zinc-400 font-mono text-xs tracking-widest uppercase mb-3">
+        <div className="p-5 border-t border-[#d1e8d8] space-y-2">
+          <label className="block text-[#6b7280] font-mono text-xs tracking-widest uppercase mb-3">
             Export
           </label>
           <button
             onClick={() => exportSVG({ result, fontSize, fg: fgColor, bg: bgColor })}
-            className="w-full py-2.5 rounded-lg font-mono text-sm font-semibold bg-[#39ff14]/10 border border-[#39ff14]/30 text-[#39ff14] hover:bg-[#39ff14]/20 transition-colors"
+            className="w-full py-2.5 rounded-lg font-mono text-sm font-semibold bg-[#166534]/10 border border-[#166534]/30 text-[#166534] hover:bg-[#166534]/20 transition-colors"
           >
             Download SVG
           </button>
           <button
             onClick={() => exportPNG({ result, fontSize, fg: fgColor, bg: bgColor })}
-            className="w-full py-2.5 rounded-lg font-mono text-sm font-semibold bg-zinc-800 border border-zinc-700 text-white hover:bg-zinc-700 transition-colors"
+            className="w-full py-2.5 rounded-lg font-mono text-sm font-semibold bg-white border border-[#c8d9cc] text-[#1a1a1a] hover:bg-[#e6f2ea] transition-colors"
           >
             Download PNG
           </button>
