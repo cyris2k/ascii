@@ -42,7 +42,7 @@ export default function Home() {
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const ascii = convertToAscii(imageData, { mode, cols, invert, customText, regions, baseFgColor, adjustments });
     setResult(ascii);
-  }, [image, mode, cols, invert, customText, regions, baseFgColor]);
+  }, [image, mode, cols, invert, customText, regions, baseFgColor, adjustments]);
 
   useEffect(() => {
     if (image) process();
